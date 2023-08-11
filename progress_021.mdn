@@ -1,0 +1,183 @@
+0208 2023
+1503
+socket rooms. shouldnt be too hard. objective dfor today: have two sessions with different chats in them. using socket.
+some kinda identifier? name?
+
+start vite, svelte, and the app server.
+
+setup setup ... need the epxress for the socket. i want chat rooms, parker!! pictures of chat rooms!
+
+it feels weird to have to add socket.io-client dependency in the packagejson file for a socket project, i thought oine of the points was to have the client side servd at run time?
+
+<
+ruin tme
+
+out of time
+
+time mechanic
+<
+
+anyway i npm i'd it
+
+i set up some code but im getting cors errors. im trying t oset up the socket connection but its not taking. 
+i had forgotten to set the ports of the listeners. embarrassing.
+
+yeah that did it. no more cors erors.
+
+im messin with the room code and nows telling me its some kinda invalid code.
+
+So somethings cauissing it to spit itself 
+im gettging some strange crashes in the app. invalid listener type argument from the socket ... i think its my room ipnput -- what do you call it -- socket lisener?
+
+it was the room leave function.
+
+lets see if leaving ... nope, leaving still messes it up. why is that?
+it sbecauea i had a misplaced parenthesis, thats why.
+
+and now it works, glory be, bloodbag!
+
+0308 2023
+0255
+how does the thing know where the svelte is? if i put the svelte frontend in a room in socket, how does the user window knows it in a room? i suppose it doesnt. it just ... a way to separate input.
+
+so i need a room that takes two people, and then starts the game when clicked. the game makes the baord, the board is shot by players. one player runs out of ships, the end.
+
+so the chatform eleemtn isnt working because it doesnt know what socket is. the socket IS defined in  the place the element s called ---- i  guess this is why svelte has global variables. stores, they call em.
+i guess you handle that with middleware? once a room is joined .... naw,... but the room controls it owns. so... ... the game data file ... i mean the ui is a interface but it shouldnt hHOLD data, right?
+
+ so i guess you just go like, "for room, do data and operations".
+
+0408 2023
+2255
+all this stuff i ve been doing is because i dont know howt make a control loop flow for the game. I figured id let the sockets do it for me. On input, do thing.
+
+beoffre i can do any of that, though ,igotta fix the chat form. guh.
+
+fuck it, im axing chatform.
+
+starting to get the feel that all my troubles COUDL have been sorted by await.
+
+ok now i can give myself a name (socket.name), i wanna test if i can GET the name of mylsef from the server to the frontend. Im guessing .... maybe. I AM interacting wi the socket object. it should be the sdame object, yes?
+
+doesnt grip.
+
+ive set the sockets name in the server. i guess i could store it? svelte style?
+
+but i dont feel like storing game state anywhere. i jsut wanna send and transmit and modify data.
+
+i want it to check if the pl,ayer has a name before itll start, but the thing keeps crashing. says it doesnt know the socket. i SWEAR this is the EXACT same type of problem ive had with java so many times, not having an object passed properly into a function.'
+
+it seems iut doesnt know ANYTHING abouyt the socket
+Doing it this way MUST be a sign of desperation. Im making an object in the server to handle local data.
+
+the object´s purpose is to let the game start function know about the socket thats starting it.
+
+i suppose i oculd just fold it into the socket function tho.
+
+im gonna try moving it over there.
+
+
+oh ... i think i ... i think because i had 
+
+    socket.on("start_game", (socket) => {
+        console.log("start_game, socket:", socket);
+        newGame(socket);
+    }); 
+
+the socket in  the parameters of the arrow function overrode the socket of the above environment, cauinsg it to be null.
+
+yup that did it.
+
+ok now i gotta broadcast the name ofthe room thats been joined, so others can join it.
+
+hang on, am i overthinking this? there should be a tyihng in the io on the CLIENT side that recieves new updates from the server -- but iom not seeing it.
+
+so i just took the io socket call out of the onMount and it still works afaict -- let seee . ...
+
+the joy of copypasting in unknown regex
+
+ok now i have the io handler emitting something but how do i get the socket t olisten for it=?
+
+it turns ouit you derclare the soket public and have it listen .on as usual. OK ... noww hwat.
+
+im having trouble updating page text. i know isolved this in 020.
+
+so now it can make rooms and you can join them. youll have to regeisters as second player in the room, then the game can begein.
+
+ine player should be able to start a game, place boaits and fire upon boats. boats can be preset.
+
+0508 2023
+0121
+i think i have a pretty good understanding of how to use the rooms now. sort of
+
+coould i just ... dump the etnrei 020 into 021? as an import? i dont see why not?
+
+oh jesus, you can
+
+my god
+
+it looks malformed.
+
+the beast with too many buttons
+
+i tyhink i SHOULD do a store.
+
+is that possible? one store with all the games in it?
+
+should be OK. right? (wrong), only fr limited games.
+
+im trying to do the "two palyers can join same room" and also the chat.
+
+the API could expose alist of current games and current players online thatd be cool
+
+0608 2023
+0416
+no, im not waking up at 0400 in ortder to code. im just ... not falling asleep.'
+
+so once i have a player in a room, they gotta put in their boats.
+
+ok, i got the grid integrated. its not pretty. but then, it never was.
+
+having some trouble with the leading zeroes in the grid. 
+
+hah, im having a funny problem: im using parseInt to remove the leading zeroes from the grid ID (eg, 002 becomes 2), but, if the id is ALL zeroes then obv ...
+so i gotta catch that.
+
+stioll having trouble with all this.
+
+ahjhhhh of course, its because i have TWO numbers: one for the grid id itself (000-029) and one for what it contains: map and key. or... property and value?
+
+Anyway, 000 should have 1. 
+
+turns out, btw, that parseInt(000) still gives 0, and not undefined. i think. 
+
+iom still getting undefined for the array, though. its trying to access... 000?
+
+the array is missing an index. that of 000. thats odd. a bit of experimentation reveals that array[000] SHOULD just put it in the 0th index. so what gives? why is my index 0 empty? i suspect the shipplacement function has a bug.
+
+found it -- i had a sanitiser stub:
+if (trargetGridNumber), which, when responding to 0, of course went falsy. it should work now.
+
+the way ive structured the prograem so far is a long chain of functions calling functions. 
+
+0847
+jsut had a bug (again) -- i added a fillDummyData function to the b_grid, but since I forgot to define the b_grid first, it killed the start mount. Without onMount, notrhing works.
+
+ok, solved that. now it thinks that the grid doesnt exist. i think its because its trying to access an empty thing, ya?
+
+i think the b_grid thing MAYBE was because i was putting the function itself into the variable.
+
+yeah that did it. now i can shoot at things that ARENT my own grids. Ie. the b_grid dummy data.
+
+0708 2023
+0656
+
+I really shjould get some better css in this shit.
+
+080 2023
+0513
+so i want to make it so that two players can connect. i got it shooting and taking boats, logically the next step is the actual multiplayer.
+
+first i gott amake the playing field bigger.
+
+so it turns out that my css isnt event connected to the html at alll. i assumed i had the root link of the html dom in thecss linking it to the flex, but, it turns i actually deleted that link. Si,.. thats why not one of my flex things have worked ina while. progrss!
